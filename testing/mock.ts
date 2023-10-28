@@ -1027,6 +1027,28 @@ export function assertSpyCallArgs<
   return args as ExpectedArgs;
 }
 
+/** Asserts that a spy is called as expected at any index. */
+export function assertSomeSpyCall<
+  Self,
+  Args extends unknown[],
+  Return,
+>(
+  spy: Spy<Self, Args, Return>,
+  expected: ExpectedSpyCall<Self, Args, Return>,
+) {
+  const some = spy.calls.some((_, index) => {
+    try {
+      assertSpyCall(spy, index, expected);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  if (!some) {
+    throw new AssertionError("spy call does not exist");
+  }
+}
+
 /** Creates a function that returns the instance the method was called on. */
 export function returnsThis<
   // deno-lint-ignore no-explicit-any
